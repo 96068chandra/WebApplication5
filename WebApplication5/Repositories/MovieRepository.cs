@@ -107,5 +107,11 @@ namespace WebApplication5.Repositories
         //{
         //    throw new System.NotImplementedException();
         //}
+
+        public async Task<IEnumerable<Genre>> GetGenres()
+        {
+            var genres= await _context.Genres.ToListAsync();
+            return genres;
+        }
     }
 }

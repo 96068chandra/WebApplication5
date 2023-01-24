@@ -91,6 +91,14 @@ namespace WebApplication5.Controllers
             return NotFound("Please provide valid genre");
         }
 
+        [HttpGet("GetGenres")]
+
+        public async Task<IActionResult> GetGenres()
+        {
+           var genres= await _movieRepository.GetGenres();
+            return Ok(genres);
+        }
+
 
     }
 }
