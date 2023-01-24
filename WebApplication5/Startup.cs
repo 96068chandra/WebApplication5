@@ -34,7 +34,7 @@ namespace WebApplication5
 
             services.AddScoped<IRepository<Movie>, MovieRepository>();
             services.AddScoped<IMovieRepository, MovieRepository>();
-
+            services.AddScoped<IGetRepository<MovieDto>, MovieRepository>();
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {

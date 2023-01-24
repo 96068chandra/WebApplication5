@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +8,7 @@ using WebApplication5.Models;
 
 namespace WebApplication5.Repositories
 {
-    public class MovieRepository : IRepository<Movie>, IMovieRepository
+    public class MovieRepository : IRepository<Movie>, IMovieRepository,IGetRepository<MovieDto>
     {
         private readonly ApplicationDbContext _context;
 
@@ -39,19 +40,40 @@ namespace WebApplication5.Repositories
             return null;
         }
 
-        public IEnumerable<Movie> GetAll()
+        public IEnumerable<MovieDto> GetAll()
         {
-            return _context.Movies.ToList();
+            var movies = _context.Movies.Include(m => m.Genre).Select(x => new MovieDto
+            {
+                Id = x.Id,
+                MovieName = x.MovieName,
+                ProductionName = x.ProductionName,
+                ReleaseDate = x.ReleaseDate,
+                GenreId = x.GenreId,
+                GenreName = x.Genre.GenreName
+            }).ToList();
+            return movies;
+
+            
         }
 
-        public async Task<Movie> GetById(int id)
+        public async Task<MovieDto> GetById(int id)
         {
-            var movie=await _context.Movies.FindAsync(id);
-            if (movie != null)
+            var movies =  await _context.Movies.Include(m => m.Genre).Select(x => new MovieDto
             {
-                return movie;
-            }
+                Id = x.Id,
+                MovieName = x.MovieName,
+                ProductionName = x.ProductionName,
+                ReleaseDate = x.ReleaseDate,
+                GenreId = x.GenreId,
+                GenreName = x.Genre.GenreName
+            }).ToListAsync();
+
+            var movie=movies.FirstOrDefault(x=>x.Id == id);
+
+            if (movie != null)
+            { return movie; }
             return null;
+
         }
 
         public async Task<Movie> Update(int id, Movie obj)
@@ -70,8 +92,8 @@ namespace WebApplication5.Repositories
             }
             return null;
         }
-         
 
+        
         public async Task<IEnumerable<Movie>> SearchByGenre(string genreName)
         {
             if(!string.IsNullOrWhiteSpace(genreName))
